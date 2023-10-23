@@ -91,14 +91,19 @@ public class ClientHandler {
 
             String message = in.readUTF();
             if (message.startsWith("/")) {
-                if (message.equals("/exit")) {
+                String[] args = message.split(" ");
+                String command = args[0];
+                if (command.equals("/exit")) {
                     break;
-                } else if (message.equals("/list")) {
+                } else if (command.equals("/w")) {
+                    String username = args[1];
+                    server.sendMessageToUser(username, message.substring(4 + username.length()));
+                } else if (command.equals("/list")) {
                     List<String> userList = server.getUserList();
-                    String joinedUsers =
-                            String.join(", ", userList);
-//                            userList.stream().collect(Collectors.joining(","));
+                    String joinedUsers = String.join(", ", userList);
                     sendMessage(joinedUsers);
+                } else {
+                    server.broadcastMessage("Server: " + command + " не поддерживается");
                 }
             } else {
                 server.broadcastMessage("Server: " + message);
