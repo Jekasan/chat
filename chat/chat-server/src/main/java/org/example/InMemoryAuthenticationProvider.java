@@ -22,6 +22,11 @@ public class InMemoryAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
+    public Roles getRole(String username) {
+        return null;
+    }
+
+    @Override
     public synchronized boolean register(String login, String password, String username) {
         for (User user : users) {
             if (Objects.equals(user.getUsername(), username) && Objects.equals(user.getLogin(), login)) {

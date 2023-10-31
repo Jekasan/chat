@@ -15,6 +15,8 @@ public class ClientHandler {
 
     private String username;
 
+    private Roles roles;
+
     private static int userCount = 0;
 
     public String getUsername() {
@@ -59,6 +61,7 @@ public class ClientHandler {
                         sendMessage(username + ", добро пожаловать в чат!");
                         server.subscribe(this);
                         isAuthenticated = true;
+                        this.roles = server.getAuthenticationProvider().getRole(username);
                     }
                     break;
                 }
@@ -74,6 +77,7 @@ public class ClientHandler {
                         sendMessage(nick + ", добро пожаловать в чат!");
                         server.subscribe(this);
                         isAuthenticated = true;
+                        this.roles = server.getAuthenticationProvider().getRole(username);
                     }
                     break;
                 }
@@ -102,6 +106,13 @@ public class ClientHandler {
                     List<String> userList = server.getUserList();
                     String joinedUsers = String.join(", ", userList);
                     sendMessage(joinedUsers);
+                } else if (command.equals("/kick")) {
+                    String username = args[1];
+                    if (this.roles == Roles.ADMIN) {
+                        server.kickUser(username);
+                    } else {
+                        server.broadcastMessage("у вас нет прав администратора");
+                    }
                 } else {
                     server.broadcastMessage("Server: " + command + " не поддерживается");
                 }
