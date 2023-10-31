@@ -15,6 +15,8 @@ public class ClientHandler {
 
     private String username;
 
+    private Roles roles;
+
     private static int userCount = 0;
 
     public String getUsername() {
@@ -59,6 +61,7 @@ public class ClientHandler {
                         sendMessage(username + ", добро пожаловать в чат!");
                         server.subscribe(this);
                         isAuthenticated = true;
+                        this.roles = server.getAuthenticationProvider().getRole(username);
                     }
                     break;
                 }
@@ -74,6 +77,7 @@ public class ClientHandler {
                         sendMessage(nick + ", добро пожаловать в чат!");
                         server.subscribe(this);
                         isAuthenticated = true;
+                        this.roles = server.getAuthenticationProvider().getRole(username);
                     }
                     break;
                 }
@@ -91,14 +95,26 @@ public class ClientHandler {
 
             String message = in.readUTF();
             if (message.startsWith("/")) {
-                if (message.equals("/exit")) {
+                String[] args = message.split(" ");
+                String command = args[0];
+                if (command.equals("/exit")) {
                     break;
-                } else if (message.equals("/list")) {
+                } else if (command.equals("/w")) {
+                    String username = args[1];
+                    server.sendMessageToUser(username, message.substring(4 + username.length()));
+                } else if (command.equals("/list")) {
                     List<String> userList = server.getUserList();
-                    String joinedUsers =
-                            String.join(", ", userList);
-//                            userList.stream().collect(Collectors.joining(","));
+                    String joinedUsers = String.join(", ", userList);
                     sendMessage(joinedUsers);
+                } else if (command.equals("/kick")) {
+                    String username = args[1];
+                    if (this.roles == Roles.ADMIN) {
+                        server.kickUser(username);
+                    } else {
+                        server.broadcastMessage("у вас нет прав администратора");
+                    }
+                } else {
+                    server.broadcastMessage("Server: " + command + " не поддерживается");
                 }
             } else {
                 server.broadcastMessage("Server: " + message);
