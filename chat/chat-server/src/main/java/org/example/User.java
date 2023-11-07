@@ -5,6 +5,8 @@ public class User {
     private String password;
     private String username;
 
+    private Roles role;
+
     public String getLogin() {
         return login;
     }
@@ -21,5 +23,14 @@ public class User {
         this.login = login;
         this.password = password;
         this.username = username;
+        this.role = Roles.USER;
+    }
+    public void setRole(Roles role) {
+        this.role = role;
+    }
+
+
+    public Roles getRole() {
+        return role;
     }
 }
